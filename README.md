@@ -1,1 +1,1223 @@
-# AmiroDev
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmiroDev | Enterprise Code & AI Platform</title>
+
+    <!-- Fonts: Orbitron for Sci-Fi headers, Inter/Vazirmatn for readability -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@400;700;900&family=Vazirmatn:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Icon Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           CSS VARIABLES & THEME
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        
+         :root {
+            /* Default: Blue Cyber Matrix */
+            --primary-color: #00f3ff;
+            --secondary-color: #0066ff;
+            --accent-color: #ff0055;
+            --bg-color: #050510;
+            --glass-bg: rgba(10, 15, 30, 0.65);
+            --glass-border: rgba(0, 243, 255, 0.3);
+            --text-color: #e0f7ff;
+            --text-muted: #8baec4;
+            --grid-color: rgba(0, 243, 255, 0.15);
+            --card-hover-transform: translateY(-5px) scale(1.02);
+            --font-head: 'Orbitron', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-fa: 'Vazirmatn', sans-serif;
+            --transition-speed: 0.3s;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            outline: none;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            transition: background-color 0.5s ease;
+        }
+        /* Scrollbar */
+        
+         ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+         ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        
+         ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           UTILITY CLASSES
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color);
+        }
+        
+        .neon-box {
+            box-shadow: 0 0 10px var(--glass-border), inset 0 0 5px var(--glass-border);
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .btn {
+            cursor: pointer;
+            border: 1px solid var(--primary-color);
+            background: transparent;
+            color: var(--primary-color);
+            padding: 10px 20px;
+            font-family: var(--font-head);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .btn:hover {
+            background: var(--primary-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px var(--primary-color);
+        }
+        /* RTL Support */
+        
+        [dir="rtl"] {
+            font-family: var(--font-fa);
+            direction: rtl;
+        }
+        
+        [dir="rtl"] .btn {
+            clip-path: polygon(0 0, 90% 0, 100% 30%, 100% 100%, 10% 100%, 0 70%);
+        }
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           LOADING SCREEN
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s;
+        }
+        
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid transparent;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           CANVAS BACKGROUND
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           NAVIGATION
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-logo {
+            font-family: var(--font-head);
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           MAIN LAYOUT
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        
+        main {
+            padding: 120px 5% 50px;
+            min-height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .section-title {
+            font-family: var(--font-head);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           FREE COURSE SYSTEM
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        
+        .course-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+        
+        .main-course-box {
+            width: 300px;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 20px;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        
+        .main-course-box::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(45deg, var(--primary-color), transparent, var(--secondary-color));
+            border-radius: 22px;
+            z-index: -1;
+            animation: spinBorder 4s linear infinite;
+        }
+        
+        @keyframes spinBorder {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 50px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .course-grid.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+        
+        .lang-card {
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .lang-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 243, 255, 0.2);
+        }
+        
+        .lang-card i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           CONTENT VIEWER (100 ITEMS)
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        
+        #content-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 16, 0.95);
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            padding: 2rem;
+        }
+        
+        .viewer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            overflow-y: auto;
+            padding-right: 10px;
+            height: calc(100% - 100px);
+        }
+        
+        .content-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .content-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary-color);
+        }
+        
+        .item-name {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .item-short {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .item-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 600px;
+            padding: 2rem;
+            z-index: 210;
+            display: none;
+            border: 1px solid var(--primary-color);
+        }
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           PYTHON SOURCE CODE MODAL
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        
+        #python-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 300;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            width: 90%;
+            max-width: 900px;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .code-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 15px 0;
+        }
+        
+        .code-box {
+            background: #0d0d0d;
+            border-left: 3px solid var(--primary-color);
+            padding: 10px;
+            position: relative;
+        }
+        
+        pre {
+            color: #a9b7c6;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           PORTFOLIO & CONTACT
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .project-card {
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            position: relative;
+        }
+        
+        .contact-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .contact-card {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .phone-number {
+            font-size: 2rem;
+            font-family: var(--font-head);
+            color: var(--primary-color);
+            margin: 20px 0;
+            text-decoration: none;
+            display: block;
+        }
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           RESPONSIVE
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .section-title {
+                font-size: 1.8rem;
+            }
+            .main-course-box {
+                width: 250px;
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="loader-spinner"></div>
+        <h2 style="margin-top: 20px; font-family: var(--font-head);" class="neon-text">INITIALIZING SYSTEM</h2>
+    </div>
+
+    <!-- 3D Background -->
+    <div id="canvas-container"></div>
+
+    <!-- Navigation -->
+    <nav class="glass">
+        <div class="nav-logo">
+            <i class="fas fa-cube neon-text"></i>
+            <span>AMIRO<span style="color:var(--primary-color)">DEV</span></span>
+        </div>
+        <div class="nav-links">
+            <!-- Theme Changer -->
+            <button class="btn" id="theme-btn" onclick="changeTheme()">
+                <i class="fas fa-palette"></i> <span data-i18n="changeTheme">Change Theme</span>
+            </button>
+
+            <!-- Language Changer -->
+            <button class="btn" id="lang-btn" onclick="changeLanguage()">
+                <i class="fas fa-globe"></i> <span id="current-lang">EN</span>
+            </button>
+
+            <!-- Python Codes -->
+            <button class="btn" onclick="openPythonModal()">
+                <i class="fab fa-python"></i> <span data-i18n="pythonCode">Python Source Code</span>
+            </button>
+
+            <!-- Portfolio -->
+            <button class="btn" onclick="scrollToSection('portfolio')">
+                <i class="fas fa-briefcase"></i> <span data-i18n="portfolio">Portfolio</span>
+            </button>
+
+            <!-- Contact -->
+            <button class="btn" onclick="openContact()">
+                <i class="fas fa-address-book"></i> <span data-i18n="contact">Contact</span>
+            </button>
+
+            <!-- Socials -->
+            <a href="https://youtube.com/@AmiroDev" target="_blank" class="btn" style="border-color: #ff0000; color: #ff0000;">
+                <i class="fab fa-youtube"></i>
+            </a>
+            <a href="https://instagram.com/AmiroDev" target="_blank" class="btn" style="border-color: #e1306c; color: #e1306c;">
+                <i class="fab fa-instagram"></i>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+
+        <!-- Free Course Section -->
+        <section class="course-container">
+            <h1 class="section-title neon-text" data-i18n="freeCourse">FREE COURSE</h1>
+
+            <div class="main-course-box glass neon-box" onclick="toggleCourses()">
+                <i class="fas fa-code-branch" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 10px;"></i>
+                <h2 style="font-family: var(--font-head);" data-i18n="startLearning">START LEARNING</h2>
+                <p style="margin-top: 10px; font-size: 0.9rem;" data-i18n="clickToExpand">Click to Expand System</p>
+            </div>
+
+            <div class="course-grid" id="course-grid">
+                <!-- Cards injected by JS -->
+            </div>
+        </section>
+
+        <!-- Portfolio Section -->
+        <section id="portfolio" style="margin-top: 100px;">
+            <h2 class="section-title" data-i18n="portfolio">Portfolio</h2>
+            <div class="portfolio-grid">
+                <a href="https://019b6e2e-f19a-71b3-a867-cfc74e3bb140.app.noqte.ai" target="_blank" class="project-card glass neon-box">
+                    <h3>Project Alpha</h3>
+                    <p>Enterprise Application</p>
+                    <div style="margin-top: 20px;"><i class="fas fa-external-link-alt"></i></div>
+                </a>
+                <a href="https://019b6e55-e1fc-7951-8b47-73a58fd43937.app.noqte.ai" target="_blank" class="project-card glass neon-box">
+                    <h3>Project Beta</h3>
+                    <p>Web Interactive Tool</p>
+                    <div style="margin-top: 20px;"><i class="fas fa-external-link-alt"></i></div>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Content Viewer (100 Items) -->
+    <div id="content-viewer">
+        <div class="viewer-header glass">
+            <h2 id="viewer-title" style="color: var(--primary-color);">PYTHON</h2>
+            <button class="btn" onclick="closeViewer()"><i class="fas fa-times"></i> Close</button>
+        </div>
+        <div class="content-grid" id="content-list">
+            <!-- Items injected by JS -->
+        </div>
+    </div>
+
+    <!-- Detail Modal (Item Click) -->
+    <div id="item-detail-modal" class="glass item-modal">
+        <h3 id="detail-title" style="color: var(--primary-color); margin-bottom: 10px;"></h3>
+        <p id="detail-desc" style="line-height: 1.6; font-size: 1rem;"></p>
+        <div style="text-align: right; margin-top: 20px;">
+            <button class="btn" onclick="document.getElementById('item-detail-modal').style.display='none'">Close</button>
+        </div>
+    </div>
+
+    <!-- Python Modal -->
+    <div id="python-modal">
+        <div class="modal-content glass">
+            <div class="viewer-header">
+                <h2 data-i18n="pythonCode">Python Source Code</h2>
+                <button class="btn" onclick="closePythonModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="code-list" id="python-list">
+                <!-- Code injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contact-modal" class="contact-modal">
+        <div class="contact-card glass">
+            <h2 data-i18n="contactTitle">Contact Me</h2>
+            <a href="tel:09926274950" class="phone-number">09926274950</a>
+            <a href="tel:09926274950" class="btn" style="font-size: 1.2rem; padding: 15px 30px;">
+                <i class="fas fa-phone-alt"></i> Call Now
+            </a>
+            <br><br>
+            <button class="btn" onclick="document.getElementById('contact-modal').style.display='none'">Close</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" style="position: fixed; bottom: 30px; right: 30px; background: var(--primary-color); color: var(--bg-color); padding: 15px 25px; border-radius: 5px; transform: translateY(100px); transition: 0.3s; font-weight: bold; z-index: 1000;">
+        Message Here
+    </div>
+
+    <script>
+        /* ━━━━━━━━━━━━━━━━━━━━━
+                           THREE.JS BACKGROUND
+                           ━━━━━━━━━━━━━━━━━━━━━ */
+        const initThreeJS = () => {
+            const container = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
+
+            // Camera
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 30;
+            camera.position.y = 10;
+            camera.rotation.x = -0.3;
+
+            // Renderer
+            const renderer = new THREE.WebGLRenderer({
+                alpha: true,
+                antialias: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Grid Terrain (Cyber Grid)
+            const gridHelper = new THREE.GridHelper(200, 100, getComputedStyle(document.documentElement).getPropertyValue('--primary-color'), getComputedStyle(document.documentElement).getPropertyValue('--grid-color'));
+            scene.add(gridHelper);
+
+            // Particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 700;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 100;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const material = new THREE.PointsMaterial({
+                size: 0.2,
+                color: getComputedStyle(document.documentElement).getPropertyValue('--primary-color'),
+                transparent: true,
+                opacity: 0.8,
+            });
+
+            const particlesMesh = new THREE.Points(particlesGeometry, material);
+            scene.add(particlesMesh);
+
+            // Animation Loop
+            let time = 0;
+            const animate = () => {
+                requestAnimationFrame(animate);
+                time += 0.002;
+
+                // Move Grid effect
+                gridHelper.position.z = (time * 100) % 2;
+
+                // Rotate particles
+                particlesMesh.rotation.y = time * 0.5;
+
+                // Update colors dynamically if theme changes (checking CSS var)
+                const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+                gridHelper.material.color.set(primary);
+                material.color.set(primary);
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            // Resize Handler
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           DATA GENERATION (AI CONTENT)
+           ━━━━━━━━━━━━━━━━━━━━━ */
+
+        // 1. Translations
+        const translations = {
+            en: {
+                changeTheme: "Change Theme",
+                pythonCode: "Python Source Code",
+                portfolio: "Portfolio",
+                contact: "Contact",
+                freeCourse: "FREE COURSE",
+                startLearning: "START LEARNING",
+                clickToExpand: "Click to Expand System",
+                contactTitle: "Contact Me",
+                close: "Close",
+                copy: "Copy"
+            },
+            fa: {
+                changeTheme: "تغییر تم",
+                pythonCode: "سورس کد پایتون",
+                portfolio: "نمونه کارها",
+                contact: "ارتباط",
+                freeCourse: "دوره رایگان",
+                startLearning: "شروع یادگیری",
+                clickToExpand: "کلیک برای باز کردن لیست",
+                contactTitle: "تماس با من",
+                close: "بستن",
+                copy: "کپی"
+            },
+            zh: {
+                changeTheme: "更改主题",
+                pythonCode: "Python 源代码",
+                portfolio: "作品集",
+                contact: "联系",
+                freeCourse: "免费课程",
+                startLearning: "开始学习",
+                clickToExpand: "点击展开系统",
+                contactTitle: "联系我",
+                close: "关闭",
+                copy: "复制"
+            }
+        };
+
+        // 2. Python Codes (50 Items)
+        const pythonCodes = [
+            "import os\n\n# List all files in directory\nfiles = os.listdir('.')\nprint(files)",
+            "import time\n\ntime.sleep(2)\nprint('Waited 2 seconds')",
+            "import random\n\nprint(random.randint(1, 100))",
+            "# Simple Calculator\na = 10\nb = 5\nprint(a + b)",
+            "name = input('Enter name: ')\nprint(f'Hello {name}')",
+            "# Loop 0 to 9\nfor i in range(10):\n    print(i)",
+            "# File Write\nwith open('test.txt', 'w') as f:\n    f.write('Hello World')",
+            "# File Read\nwith open('test.txt', 'r') as f:\n    print(f.read())",
+            "import datetime\n\nprint(datetime.datetime.now())",
+            "# List comprehension\nsquares = [x**2 for x in range(10)]",
+            "import sys\n\nprint(sys.platform)",
+            "# Dictionary\nuser = {'name': 'Ali', 'age': 25}\nprint(user['name'])",
+            "try:\n    print(1/0)\nexcept ZeroDivisionError:\n    print('Error')",
+            "# Function\ndef greet():\n    return 'Hi'\nprint(greet())",
+            "# Class\nclass Dog:\n    def bark(self):\n        print('Woof')",
+            "import math\n\nprint(math.sqrt(16))",
+            "# Lambda\nadd = lambda x, y: x + y\nprint(add(5, 3))",
+            "# Filter\nnums = [1,2,3,4,5]\nevens = list(filter(lambda x: x%2==0, nums))",
+            "# Map\nnums = [1,2,3]\ndoubled = list(map(lambda x: x*2, nums))",
+            "import json\n\ndata = {'key': 'value'}\nprint(json.dumps(data))",
+            "import urllib.request\n\nhtml = urllib.request.urlopen('http://google.com')",
+            "import smtplib\n\n# Basic Email structure setup\nserver = smtplib.SMTP('smtp.gmail.com', 587)",
+            "# String reverse\ntxt = 'Hello'\nprint(txt[::-1])",
+            "# Check type\nprint(type(10))",
+            "import subprocess\n\nsubprocess.run(['ls', '-l'])",
+            "# Join list\nwords = ['Hello', 'World']\nprint(' '.join(words))",
+            "import hashlib\n\nprint(hashlib.md5(b'hello').hexdigest())",
+            "# Set\nmyset = {1,2,3}\nmyset.add(4)",
+            "# Enumerate\nfor i, val in enumerate(['a','b']):\n    print(i, val)",
+            "import base64\n\nencoded = base64.b64encode(b'hello')",
+            "from collections import Counter\n\nprint(Counter('hello world'))",
+            "# Random choice\nimport random\nprint(random.choice(['rock', 'paper', 'scissors']))",
+            "# File Existence\nimport os\nprint(os.path.exists('file.txt'))",
+            "import threading\n\ndef task():\n    print('Thread running')\n\nx = threading.Thread(target=task)",
+            "# Round number\nprint(round(3.14159, 2))",
+            "# Sort list\nlst = [3,1,2]\nlst.sort()\nprint(lst)",
+            "import re\n\nprint(re.findall('\\d+', '12 tests'))",
+            "# Zip\na = [1,2]\nb = [3,4]\nprint(list(zip(a,b)))",
+            "# Any / All\nprint(any([False, True]))",
+            "import inspect\n\nprint(inspect.getsource(os))",
+            "# Type Hinting\ndef add(x: int, y: int) -> int:\n    return x + y",
+            "# Global variable\nglobal_var = 10",
+            "# Recursive function\ndef factorial(n):\n    return 1 if n==0 else n*factorial(n-1)",
+            "# Format string\nage = 20\ntxt = 'I am {}'\nprint(txt.format(age))",
+            "# Remove duplicates\nlst = [1,2,2,3]\nprint(list(set(lst)))",
+            "import pickle\n\n# Save object\ndata = {'a':1}\nwith open('data.pkl', 'wb') as f:\n    pickle.dump(data, f)",
+            "import requests\n\nr = requests.get('https://api.github.com')",
+            "# Generator\ndef my_gen():\n    yield 1\n    yield 2",
+            "# Sort by key\nlst = [{'n':2}, {'n':1}]\nlst.sort(key=lambda x: x['n'])",
+            "from pathlib import Path\n\np = Path('folder')\np.mkdir()",
+            "# Timer\nimport timeit\nprint(timeit.timeit('x=x+1', setup='x=0'))",
+            "# Args\ndef func(*args):\n    print(args)"
+        ];
+
+        // 3. Course Content Generator (500 Items Total)
+        // This function generates realistic technical data to fill the 100 items requirement per language
+        const generateContent = () => {
+            const content = {
+                Python: [],
+                JavaScript: [],
+                HTML: [],
+                CSS: [],
+                C: []
+            };
+
+            // Python Data (Sample of 100 generated concepts)
+            const pyConcepts = ["print", "input", "len", "range", "def", "class", "import", "from", "return", "if", "else", "elif", "for", "while", "break", "continue", "pass", "try", "except", "finally", "with", "as", "lambda", "yield", "global", "nonlocal", "del", "assert", "raise", "True", "False", "None", "and", "or", "not", "is", "in", "list", "dict", "set", "tuple", "str", "int", "float", "bool", "complex", "bytearray", "bytes", "frozenset", "map", "filter", "reduce", "zip", "enumerate", "reversed", "sorted", "sum", "max", "min", "abs", "pow", "round", "divmod", "bin", "hex", "oct", "chr", "ord", "open", "read", "write", "close", "append", "extend", "insert", "remove", "pop", "index", "count", "sort", "reverse", "copy", "clear", "keys", "values", "items", "get", "update", "pop", "fromkeys", "add", "remove", "discard", "union", "intersection", "difference", "symmetric_difference", "issubset", "issuperset", "isdisjoint"];
+
+            pyConcepts.forEach((item, index) => {
+                content.Python.push({
+                    name: item,
+                    short: `Python function or keyword: ${item}`,
+                    desc: `The '${item}' is a built-in function, method, or keyword in Python used frequently for various operations in programming, data handling, and logic flow.`
+                });
+            });
+
+            // JavaScript Data (100 items)
+            const jsConcepts = ["console", "let", "const", "var", "function", "return", "=>", "class", "extends", "constructor", "this", "new", "super", "static", "import", "export", "default", "if", "else", "switch", "case", "break", "for", "while", "do", "try", "catch", "finally", "throw", "async", "await", "Promise", "resolve", "reject", "then", "catch", "fetch", "JSON", "parse", "stringify", "Array", "Object", "String", "Number", "Boolean", "Math", "Date", "RegExp", "Map", "Set", "WeakMap", "WeakSet", "Symbol", "BigInt", "null", "undefined", "NaN", "Infinity", "typeof", "instanceof", "void", "delete", "in", "of", "true", "false", "document", "window", "navigator", "localStorage", "sessionStorage", "querySelector", "getElementById", "addEventListener", "createElement", "appendChild", "removeChild", "classList", "style", "innerHTML", "textContent", "value", "getAttribute", "setAttribute", "offsetWidth", "clientHeight", "scroll", "click", "submit", "input", "change", "load", "DOMContentLoaded", "setTimeout", "setInterval", "requestAnimationFrame", "push", "pop", "slice", "splice", "filter", "map", "reduce"];
+            jsConcepts.forEach(item => {
+                content.JavaScript.push({
+                    name: item,
+                    short: `JS core or DOM feature: ${item}`,
+                    desc: `'${item}' is a fundamental part of JavaScript, essential for modern web development, DOM manipulation, asynchronous operations, and functional programming.`
+                });
+            });
+
+            // HTML Data (100 items)
+            const htmlTags = ["html", "head", "body", "title", "meta", "link", "script", "style", "div", "span", "p", "h1", "h2", "h3", "h4", "h5", "h6", "a", "img", "ul", "ol", "li", "table", "tr", "td", "th", "thead", "tbody", "tfoot", "form", "input", "button", "textarea", "select", "option", "label", "fieldset", "legend", "header", "nav", "main", "section", "article", "aside", "footer", "br", "hr", "strong", "em", "b", "i", "u", "s", "code", "pre", "blockquote", "q", "cite", "abbr", "address", "bdo", "dfn", "kbd", "samp", "var", "sub", "sup", "small", "mark", "del", "ins", "iframe", "canvas", "svg", "audio", "video", "source", "track", "object", "embed", "param", "map", "area", "figure", "figcaption", "details", "summary", "dialog", "menu", "menuitem", "template", "slot", "noscript", "data", "time", "progress", "meter", "output"];
+            htmlTags.forEach(item => {
+                content.HTML.push({
+                    name: `<${item}>`,
+                    short: `HTML5 Tag: ${item}`,
+                    desc: `The <${item}> tag is a semantic or structural element in HTML5 used to define content and layout within a web page.`
+                });
+            });
+
+            // CSS Data (100 items)
+            const cssProps = ["display", "position", "top", "right", "bottom", "left", "z-index", "float", "clear", "overflow", "overflow-x", "overflow-y", "width", "height", "max-width", "max-height", "min-width", "min-height", "padding", "padding-top", "padding-right", "padding-bottom", "padding-left", "margin", "margin-top", "margin-right", "margin-bottom", "margin-left", "border", "border-width", "border-style", "border-color", "border-radius", "background", "background-color", "background-image", "background-repeat", "background-position", "background-size", "background-attachment", "background-clip", "color", "font", "font-family", "font-size", "font-weight", "font-style", "font-variant", "line-height", "text-align", "text-decoration", "text-transform", "text-indent", "text-shadow", "letter-spacing", "word-spacing", "white-space", "opacity", "visibility", "cursor", "box-shadow", "text-shadow", "transition", "transform", "animation", "@keyframes", "flex", "flex-direction", "flex-wrap", "justify-content", "align-items", "align-content", "grid", "grid-template-columns", "grid-template-rows", "gap", "column-gap", "row-gap", "grid-area", "grid-column", "grid-row", "media query", "@media", "pseudo-class", ":hover", ":active", ":focus", ":visited", "::before", "::after", "filter", "backdrop-filter", "object-fit", "clip-path"];
+            cssProps.forEach(item => {
+                content.CSS.push({
+                    name: item,
+                    short: `CSS3 Property: ${item}`,
+                    desc: `The '${item}' property in CSS controls the visual presentation, layout, animation, or behavior of an HTML element.`
+                });
+            });
+
+            // C Data (100 items)
+            const cConcepts = ["int", "float", "double", "char", "void", "short", "long", "signed", "unsigned", "struct", "union", "enum", "typedef", "if", "else", "switch", "case", "default", "for", "while", "do", "break", "continue", "goto", "return", "sizeof", "printf", "scanf", "getchar", "putchar", "gets", "puts", "malloc", "calloc", "realloc", "free", "memcpy", "memset", "memmove", "memcmp", "strlen", "strcpy", "strncpy", "strcat", "strncat", "strcmp", "strncmp", "strchr", "strstr", "stdio.h", "stdlib.h", "string.h", "math.h", "time.h", "assert.h", "ctype.h", "pointer", "address", "&", "*", "->", "array", "string", "null", "NULL", "EOF", "FILE", "fopen", "fclose", "fread", "fwrite", "fseek", "ftell", "rewind", "fprintf", "fscanf", "main", "include", "define", "undef", "ifdef", "ifndef", "endif", "line", "error", "pragma", "volatile", "const", "static", "extern", "register", "auto", "bitwise", "&", "|", "^", "~", "<<", ">>"];
+            cConcepts.forEach(item => {
+                content.C.push({
+                    name: item,
+                    short: `C Language Feature: ${item}`,
+                    desc: `'${item}' is a fundamental keyword, function, or concept in the C programming language, critical for system-level programming and memory management.`
+                });
+            });
+
+            return content;
+        };
+
+        const courseData = generateContent();
+
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           THEME SYSTEM (20 THEMES)
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        const themes = [{
+                p: '#00f3ff',
+                s: '#0066ff',
+                a: '#ff0055',
+                bg: '#050510'
+            }, // Default
+            {
+                p: '#00ff9d',
+                s: '#00b85c',
+                a: '#ff0055',
+                bg: '#051005'
+            }, // Matrix Green
+            {
+                p: '#ff0055',
+                s: '#990033',
+                a: '#00f3ff',
+                bg: '#100505'
+            }, // Cyber Red
+            {
+                p: '#bd00ff',
+                s: '#7a00a6',
+                a: '#00f3ff',
+                bg: '#0f0510'
+            }, // Neon Purple
+            {
+                p: '#ffae00',
+                s: '#a67100',
+                a: '#00f3ff',
+                bg: '#100a05'
+            }, // Amber
+            {
+                p: '#ffffff',
+                s: '#aaaaaa',
+                a: '#00f3ff',
+                bg: '#000000'
+            }, // Monochrome
+            {
+                p: '#0088ff',
+                s: '#004488',
+                a: '#ffaa00',
+                bg: '#000510'
+            }, // Deep Blue
+            {
+                p: '#ff3333',
+                s: '#990000',
+                a: '#ffff00',
+                bg: '#100000'
+            }, // Heatmap
+            {
+                p: '#33ff33',
+                s: '#009900',
+                a: '#33ffff',
+                bg: '#001000'
+            }, // Toxic
+            {
+                p: '#ff00ff',
+                s: '#990099',
+                a: '#ffff00',
+                bg: '#100010'
+            }, // Vaporwave
+            {
+                p: '#01ffea',
+                s: '#008f82',
+                a: '#ff00ea',
+                bg: '#000a0a'
+            }, // Teal Cyber
+            {
+                p: '#ff9d00',
+                s: '#a65c00',
+                a: '#00ffea',
+                bg: '#0a0800'
+            }, // Orange Soda
+            {
+                p: '#b8ff00',
+                s: '#7aa600',
+                a: '#ff00ea',
+                bg: '#0a1000'
+            }, // Lime
+            {
+                p: '#0077ff',
+                s: '#003377',
+                a: '#ffae00',
+                bg: '#020510'
+            }, // Ocean
+            {
+                p: '#e0ff00',
+                s: '#8fa600',
+                a: '#ff0000',
+                bg: '#0a100a'
+            }, // Acid
+            {
+                p: '#ff0055',
+                s: '#550011',
+                a: '#55ff00',
+                bg: '#100005'
+            }, // Pink Noise
+            {
+                p: '#00ffcc',
+                s: '#008866',
+                a: '#ff0099',
+                bg: '#001010'
+            }, // Mint
+            {
+                p: '#cc00ff',
+                s: '#660080',
+                a: '#00ccff',
+                bg: '#050010'
+            }, // Grape
+            {
+                p: '#ff4d00',
+                s: '#802600',
+                a: '#00ffcc',
+                bg: '#0a0500'
+            }, // Sunset
+            {
+                p: '#888888',
+                s: '#444444',
+                a: '#ffffff',
+                bg: '#111111'
+            }, // Greyscale
+        ];
+
+        let currentThemeIndex = 0;
+
+        function changeTheme() {
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            const t = themes[currentThemeIndex];
+            const root = document.documentElement;
+
+            root.style.setProperty('--primary-color', t.p);
+            root.style.setProperty('--secondary-color', t.s);
+            root.style.setProperty('--accent-color', t.a);
+            root.style.setProperty('--bg-color', t.bg);
+
+            // Glass border update
+            root.style.setProperty('--glass-border', t.p + '4D'); // 30% opacity
+
+            showToast(`Theme: Cyber ${currentThemeIndex + 1}`);
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           LANGUAGE SYSTEM
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        const langs = ['en', 'fa', 'zh'];
+        let currentLangIndex = 0;
+
+        function changeLanguage() {
+            currentLangIndex = (currentLangIndex + 1) % langs.length;
+            const lang = langs[currentLangIndex];
+            const dir = lang === 'fa' ? 'rtl' : 'ltr';
+
+            document.documentElement.lang = lang;
+            document.documentElement.dir = dir;
+            document.getElementById('current-lang').innerText = lang.toUpperCase();
+
+            // Update text content
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerText = translations[lang][key];
+                }
+            });
+
+            showToast(`Language: ${lang.toUpperCase()}`);
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           UI INTERACTIONS
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.transform = 'translateY(0)';
+            setTimeout(() => {
+                toast.style.transform = 'translateY(100px)';
+            }, 2000);
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        function openContact() {
+            document.getElementById('contact-modal').style.display = 'flex';
+        }
+
+        function toggleCourses() {
+            const grid = document.getElementById('course-grid');
+            grid.classList.toggle('active');
+        }
+
+        // Course Cards Injection
+        const languages = [{
+            name: 'Python',
+            icon: 'fab fa-python',
+            color: '#FFD43B'
+        }, {
+            name: 'JavaScript',
+            icon: 'fab fa-js',
+            color: '#F7DF1E'
+        }, {
+            name: 'HTML',
+            icon: 'fab fa-html5',
+            color: '#E34F26'
+        }, {
+            name: 'CSS',
+            icon: 'fab fa-css3-alt',
+            color: '#1572B6'
+        }, {
+            name: 'C',
+            icon: 'fas fa-code',
+            color: '#00599C'
+        }];
+
+        const courseGrid = document.getElementById('course-grid');
+        languages.forEach(lang => {
+            const card = document.createElement('div');
+            card.className = 'lang-card glass neon-box';
+            card.innerHTML = `
+                <i class="${lang.icon}" style="color: ${lang.color}"></i>
+                <h3>${lang.name}</h3>
+                <p style="margin-top:10px; font-size:0.8rem; color:var(--text-muted)">100 Concepts</p>
+            `;
+            card.onclick = () => openContent(lang.name);
+            courseGrid.appendChild(card);
+        });
+
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           CONTENT VIEWER LOGIC
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        function openContent(langName) {
+            const viewer = document.getElementById('content-viewer');
+            const list = document.getElementById('content-list');
+            const title = document.getElementById('viewer-title');
+
+            title.innerText = langName.toUpperCase();
+            list.innerHTML = '';
+
+            const items = courseData[langName];
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'content-item';
+                div.innerHTML = `
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-short">${item.short}</div>
+                `;
+                div.onclick = () => showDetail(item);
+                list.appendChild(div);
+            });
+
+            viewer.style.display = 'flex';
+        }
+
+        function closeViewer() {
+            document.getElementById('content-viewer').style.display = 'none';
+        }
+
+        function showDetail(item) {
+            const modal = document.getElementById('item-detail-modal');
+            document.getElementById('detail-title').innerText = item.name;
+            document.getElementById('detail-desc').innerText = item.desc;
+            modal.style.display = 'block';
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           PYTHON MODAL LOGIC
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        function openPythonModal() {
+            document.getElementById('python-modal').style.display = 'flex';
+            const list = document.getElementById('python-list');
+
+            if (list.children.length === 0) {
+                pythonCodes.forEach(code => {
+                    const box = document.createElement('div');
+                    box.className = 'code-box glass';
+                    box.innerHTML = `
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>${code}</pre>
+                    `;
+                    list.appendChild(box);
+                });
+            }
+        }
+
+        function closePythonModal() {
+            document.getElementById('python-modal').style.display = 'none';
+        }
+
+        function copyCode(btn) {
+            const code = btn.nextElementSibling.innerText;
+            navigator.clipboard.writeText(code);
+            const originalText = btn.innerText;
+            btn.innerText = 'Copied!';
+            setTimeout(() => btn.innerText = originalText, 1500);
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━
+           INITIALIZATION
+           ━━━━━━━━━━━━━━━━━━━━━ */
+        window.onload = () => {
+            initThreeJS();
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loader').style.display = 'none';
+                }, 500);
+            }, 1500);
+        };
+    </script>
+</body>
+
+</html>
